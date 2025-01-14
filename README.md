@@ -263,6 +263,168 @@ let objectIdentity = identityWithConstraint({length: 10, width: 20}); // 객체�
 console.log(objectIdentity); // 출력: { length: 10, width: 20 }
 ```
 
+## 인덱스 시그니처 (Index Signatures)
+* 객체의 모든 속성에 대한 타입을 한 번에 정의
+* 동적 속성을 가진 객체를 타입 안전하게 정의할 때 유용
+* 키와 값의 타입을 지정할 수 있음
+
+  ```javascript
+  // 기본 인덱스 시그니처
+interface StringMap {
+    [key: string]: string;
+}
+
+const names: StringMap = {
+    "100": "John",
+    "200": "Jane",
+    "300": "Bob"
+};
+
+// 복합 인덱스 시그니처
+interface NumberDictionary {
+    [index: string]: number;
+    length: number;    // OK
+    // name: string;   // Error: 인덱스 시그니처가 number이므로 string 불가
+}
+
+// 여러 타입을 허용하는 인덱스 시그니처
+interface MixedDictionary {
+    [key: string]: string | number;
+    id: number;        // OK
+    name: string;      // OK
+}
+```
+
+## 타입 단언 (Type Assertions)
+* 컴파일러에게 개발자가 타입을 더 잘 알고 있음을 알리는 방법
+* 'as' 키워드나 angle-bracket(<>) 문법 사용
+* 타입 캐스팅과는 다름 (런타임에 영향을 주지 않음)
+
+```javascript
+// as 문법
+let someValue: unknown = "Hello World";
+let strLength: number = (someValue as string).length;
+
+// angle-bracket 문법 (JSX에서는 사용 불가)
+let someValue: unknown = "Hello World";
+let strLength: number = (<string>someValue).length;
+
+// 복합 타입 단언
+interface Person {
+    name: string;
+    age: number;
+}
+
+const body = document.body;
+const person = body as unknown as Person;
+
+// const 단언
+const point = { x: 3, y: 4 } as const;
+// point는 { readonly x: 3, readonly y: 4 } 타입이 됨
+```
+
+### as A / as unknown as A 차이 
+* 가능하면 타입 단언을 피하고 타입 가드를 사용
+* 타입 단언이 필요한 경우
+
+
+```javascript
+function isCustomElement(element: Element): element is CustomElement {
+  return 'customProperty' in element && 'customMethod' in element;
+}
+
+const element = document.getElementById('myElement');
+if (element && isCustomElement(element)) {
+  element.customMethod(); // 타입 안전!
+}
+```
+
+```javascript
+// 예시 1: API 응답 데이터 변환
+interface UserData {
+  id: number;
+  name: string;
+}
+
+// 🚨 직접 변환 시 에러 발생 가능
+const userData1 = JSON.parse(response) as UserData;
+
+// ✅ unknown을 통한 안전한 변환
+const userData2 = JSON.parse(response) as unknown as UserData;
+
+// 예시 2: DOM 요소 타입 변환
+interface CustomElement {
+  customProperty: string;
+  customMethod(): void;
+}
+
+// 🚨 직접 변환 시 에러 발생
+const element1 = document.getElementById('myElement') as CustomElement;
+
+// ✅ unknown을 통한 안전한 변환
+const element2 = document.getElementById('myElement') as unknown as CustomElement;
+```
+
+#### as A
+* 직접적인 타입 단언
+* 더 위험할 수 있음
+* TypeScript는 body와 Person 사이에 겹치는 속성이 있어야 함
+* 두 타입 간에 전혀 관계가 없다면 컴파일 에러가 발생할 수 있음
+
+```javascript
+interface Person {
+  name: string;
+  age: number;
+}
+
+// 이 경우 에러가 발생할 수 있음
+const person = document.body as Person; // 🚨 Type 'HTMLBodyElement' is missing properties...
+```
+
+#### as unknown as A
+* 이중 단언(double assertion)
+* 더 안전함
+* unknown을 중간 단계로 사용하여 모든 타입으로의 변환을 허용
+* TypeScript의 타입 검사를 우회할 수 있음
+
+```javascript
+interface Person {
+  name: string;
+  age: number;
+}
+
+// 컴파일 에러 없이 동작
+const person = document.body as unknown as Person; // ✅ OK
+```
+
+
+## 타입 추론 (Type Inference)
+* TypeScript가 자동으로 타입을 추론하는 방식을 이해하는 것이 중요
+* 변수 초기화, 함수 반환 값, 제네릭 등에서 발생
+* 명시적 타입 선언이 없어도 컨텍스트에 따라 타입이 결정됨
+
+```javascript
+// 변수 타입 추론
+let message = "hello"; // string으로 추론
+let numbers = [1, 2, 3]; // number[]로 추론
+
+// 객체 타입 추론
+let person = {
+    name: "John",
+    age: 30
+}; // { name: string; age: number }로 추론
+
+// 함수 반환 타입 추론
+function add(x: number, y: number) {
+    return x + y; // 반환 타입이 number로 추론
+}
+
+// 제네릭 타입 추론
+let items = <T>(items: T[]) => items[0];
+let result = items([1, 2, 3]); // number로 추론
+```
+
+
 ## 타입 가드와 타입 추론
 * 사용자 정의 타입 가드: 특정 타입이 맞는지 확인하는 함수를 정의함
 * 타입 캐스팅과 타입 확정: 변수의 타입을 명시적으로 지정하거나 확인함
@@ -381,9 +543,7 @@ console.log(updatedTodo); // 출력: { id: 1, title: 'Learn TypeScript', descrip
 }
 ```
 
-## Partial과 Record
-
-### Partial<T>
+## Partial<T>
 * 타입의 모든 속성을 선택적(optional)으로 만드는 유틸리티 타입
 * 기존 타입의 모든 속성을 '?'를 붙여 선택적으로 만듦
 * 부분적인 객체 타입을 만들 때 유용
@@ -419,7 +579,7 @@ const updatedUser = updateUser(user, {
 });
 ```
 
-### Record<K, T>
+## Record<K, T>
 * 키 타입 K와 값 타입 T를 사용하여 객체 타입을 생성하는 유틸리티 타입
 * 객체의 키와 값의 타입을 정의할 때 사용
 * 일관된 타입의 객체를 만들 때 유용
@@ -460,5 +620,38 @@ type UsersDatabase = Record<number, UserInfo>;
 const users: UsersDatabase = {
   1: { name: "John", lastLogin: new Date() },
   2: { name: "Jane", lastLogin: new Date() }
+};
+```
+
+## 템플릿 리터럴 타입
+* 문자열 리터럴 타입을 기반으로 새로운 문자열 타입을 생성
+* 타입 레벨에서 문자열 조작이 가능
+* 유니온 타입과 함께 사용하여 강력한 타입 제한 가능
+
+```javascript
+// 기본 템플릿 리터럴 타입
+type Greeting = `Hello ${string}`;
+let greeting: Greeting = "Hello World"; // OK
+let invalid: Greeting = "Hi World";     // Error
+
+// 유니온 타입과 함께 사용
+type Direction = "up" | "down";
+type Position = "top" | "bottom";
+type DirectionPosition = `${Direction}-${Position}`;
+// "up-top" | "up-bottom" | "down-top" | "down-bottom"
+
+// 실제 사용 예시
+type EventName = "click" | "focus" | "blur";
+type EventHandler = `on${Capitalize<EventName>}`;
+// "onClick" | "onFocus" | "onBlur"
+
+// CSS 속성 타입 예시
+type CSSValue = number | string;
+type CSSProperty = `${string}-${string}`;
+type CSSStyles = Record<CSSProperty, CSSValue>;
+
+const styles: CSSStyles = {
+    "font-size": 16,
+    "background-color": "#fff"
 };
 ```
