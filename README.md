@@ -381,5 +381,84 @@ console.log(updatedTodo); // 출력: { id: 1, title: 'Learn TypeScript', descrip
 }
 ```
 
-### 참고
-* https://www.typescriptlang.org/docs/handbook/intro.html
+## Partial과 Record
+
+### Partial<T>
+* 타입의 모든 속성을 선택적(optional)으로 만드는 유틸리티 타입
+* 기존 타입의 모든 속성을 '?'를 붙여 선택적으로 만듦
+* 부분적인 객체 타입을 만들 때 유용
+* 객체의 일부 속성만 업데이트할 때 자주 사용됨
+
+```javascript
+// Partial 사용
+type PartialUser = Partial<User>;
+// 결과:
+// {
+//   id?: number;
+//   name?: string;
+//   age?: number;
+//   email?: string;
+// }
+
+// 실제 사용 예시
+function updateUser(user: User, updates: Partial<User>): User {
+  return { ...user, ...updates };
+}
+
+const user: User = {
+  id: 1,
+  name: "John",
+  age: 30,
+  email: "john@example.com"
+};
+
+// 일부 속성만 업데이트
+const updatedUser = updateUser(user, {
+  age: 31,
+  email: "john.doe@example.com"
+});
+```
+
+### Record<K, T>
+* 키 타입 K와 값 타입 T를 사용하여 객체 타입을 생성하는 유틸리티 타입
+* 객체의 키와 값의 타입을 정의할 때 사용
+* 일관된 타입의 객체를 만들 때 유용
+* 특히 동적 키를 가진 객체를 타입 안전하게 정의할 때 자주 사용됨
+
+```javascript
+// 기본 사용 예시
+type UserRoles = Record<string, boolean>;
+const roles: UserRoles = {
+  admin: true,
+  editor: false,
+  viewer: true
+};
+
+// enum과 함께 사용
+enum UserStatus {
+  Active = "ACTIVE",
+  Inactive = "INACTIVE",
+  Pending = "PENDING"
+}
+
+type UserStatusMessages = Record<UserStatus, string>;
+
+const statusMessages: UserStatusMessages = {
+  [UserStatus.Active]: "User is active",
+  [UserStatus.Inactive]: "User is inactive",
+  [UserStatus.Pending]: "User is pending activation"
+};
+
+// 복잡한 값 타입과 함께 사용
+interface UserInfo {
+  name: string;
+  lastLogin: Date;
+}
+
+type UsersDatabase = Record<number, UserInfo>;
+
+const users: UsersDatabase = {
+  1: { name: "John", lastLogin: new Date() },
+  2: { name: "Jane", lastLogin: new Date() }
+};
+```
