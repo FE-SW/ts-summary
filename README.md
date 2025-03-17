@@ -279,8 +279,9 @@ console.log(objectIdentity); // 출력: { length: 10, width: 20 }
 * 동적 속성을 가진 객체를 타입 안전하게 정의할 때 유용
 * 키와 값의 타입을 지정할 수 있음
 
-  ```javascript
-  // 기본 인덱스 시그니처
+```javascript
+
+// 기본 인덱스 시그니처
 interface StringMap {
     [key: string]: string;
 }
