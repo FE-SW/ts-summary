@@ -543,6 +543,39 @@ console.log(updatedTodo); // 출력: { id: 1, title: 'Learn TypeScript', descrip
 }
 ```
 
+## 템플릿 리터럴 타입
+* 문자열 리터럴 타입을 기반으로 새로운 문자열 타입을 생성
+* 타입 레벨에서 문자열 조작이 가능
+* 유니온 타입과 함께 사용하여 강력한 타입 제한 가능
+
+```javascript
+// 기본 템플릿 리터럴 타입
+type Greeting = `Hello ${string}`;
+let greeting: Greeting = "Hello World"; // OK
+let invalid: Greeting = "Hi World";     // Error
+
+// 유니온 타입과 함께 사용
+type Direction = "up" | "down";
+type Position = "top" | "bottom";
+type DirectionPosition = `${Direction}-${Position}`;
+// "up-top" | "up-bottom" | "down-top" | "down-bottom"
+
+// 실제 사용 예시
+type EventName = "click" | "focus" | "blur";
+type EventHandler = `on${Capitalize<EventName>}`;
+// "onClick" | "onFocus" | "onBlur"
+
+// CSS 속성 타입 예시
+type CSSValue = number | string;
+type CSSProperty = `${string}-${string}`;
+type CSSStyles = Record<CSSProperty, CSSValue>;
+
+const styles: CSSStyles = {
+    "font-size": 16,
+    "background-color": "#fff"
+};
+```
+
 ## Partial<T>
 * 타입의 모든 속성을 선택적(optional)으로 만드는 유틸리티 타입
 * 기존 타입의 모든 속성을 '?'를 붙여 선택적으로 만듦
@@ -623,35 +656,111 @@ const users: UsersDatabase = {
 };
 ```
 
-## 템플릿 리터럴 타입
-* 문자열 리터럴 타입을 기반으로 새로운 문자열 타입을 생성
-* 타입 레벨에서 문자열 조작이 가능
-* 유니온 타입과 함께 사용하여 강력한 타입 제한 가능
+## Required<T>
+* 모든 속성을 필수로 만드는 유틸리티 타입
+* 선택적 속성을 포함한 타입을 필수 속성으로 변환할 때 유용
 
 ```javascript
-// 기본 템플릿 리터럴 타입
-type Greeting = `Hello ${string}`;
-let greeting: Greeting = "Hello World"; // OK
-let invalid: Greeting = "Hi World";     // Error
+interface User {
+  id?: number;
+  name?: string;
+  age?: number;
+  email?: string;
+}
 
-// 유니온 타입과 함께 사용
-type Direction = "up" | "down";
-type Position = "top" | "bottom";
-type DirectionPosition = `${Direction}-${Position}`;
-// "up-top" | "up-bottom" | "down-top" | "down-bottom"
+// Required 사용
+type RequiredUser = Required<User>;
+// 결과:
+// {
+//   id: number;
+//   name: string;
+//   age: number;
+//   email: string;
+// }
 
 // 실제 사용 예시
-type EventName = "click" | "focus" | "blur";
-type EventHandler = `on${Capitalize<EventName>}`;
-// "onClick" | "onFocus" | "onBlur"
-
-// CSS 속성 타입 예시
-type CSSValue = number | string;
-type CSSProperty = `${string}-${string}`;
-type CSSStyles = Record<CSSProperty, CSSValue>;
-
-const styles: CSSStyles = {
-    "font-size": 16,
-    "background-color": "#fff"
+const user: RequiredUser = {
+  id: 1,
+  name: "John",
+  age: 30,
+  email: "john@example.com"
 };
+```
+
+## Pick<T, K>
+* 특정 속성만 선택하여 새로운 타입을 생성하는 유틸리티 타입
+* 필요한 속성만 포함하는 타입을 만들 때 유용
+
+```javascript
+interface User {
+  id: number;
+  name: string;
+  age: number;
+  email: string;
+}
+
+// Pick 사용
+type PickedUser = Pick<User, "id" | "name">;
+// 결과:
+// {
+//   id: number;
+//   name: string;
+// }
+
+// 실제 사용 예시
+const user: PickedUser = {
+  id: 1,
+  name: "John"
+};
+```
+
+## Exclude<T, U>
+* 특정 속성만 선택하여 새로운 타입을 생성하는 유틸리티 타입
+* 필요한 속성만 포함하는 타입을 만들 때 유용
+
+```javascript
+type AllTypes = string | number | boolean;
+
+// Exclude 사용
+type StringOrNumber = Exclude<AllTypes, boolean>;
+// 결과: string | number
+
+// 실제 사용 예시
+let value: StringOrNumber = "Hello";
+value = 42;
+// value = true; // 오류 발생
+```
+
+## Extract<T, U>
+* 타입 T에서 타입 U와 겹치는 부분만 추출하는 유틸리티 타입
+* 두 타입 간의 교집합을 만들 때 유용
+
+```javascript
+type AllTypes = string | number | boolean;
+
+// Extract 사용
+type StringOrBoolean = Extract<AllTypes, string | boolean>;
+// 결과: string | boolean
+
+// 실제 사용 예시
+let value: StringOrBoolean = "Hello";
+value = true;
+// value = 42; // 오류 발생
+```
+
+## NonNullable<T>
+* null과 undefined를 제거하는 유틸리티 타입
+* 항상 값이 있는 타입을 만들 때 유용
+
+```javascript
+type NullableString = string | null | undefined;
+
+// NonNullable 사용
+type NonNullableString = NonNullable<NullableString>;
+// 결과: string
+
+// 실제 사용 예시
+let value: NonNullableString = "Hello";
+// value = null; // 오류 발생
+// value = undefined; // 오류 발생
 ```
