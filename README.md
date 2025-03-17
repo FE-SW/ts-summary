@@ -17,6 +17,19 @@ let bool: boolean = true;
 let arr: number[] = [1, 2, 3];
 let tuple: [string, number] = ["John", 25];
 enum Colors { Red, Green, Blue }
+
+function logMessage(message: string): void {
+  console.log(message);
+}
+function throwError(message: string): never {
+  throw new Error(message);
+}
+function infiniteLoop(): never {
+  while (true) {
+    // 무한 루프
+  }
+}
+
 let c: Colors = Colors.Red;
 let notSure: any = 4;
 notSure = "maybe a string";
