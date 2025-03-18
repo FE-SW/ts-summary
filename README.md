@@ -496,23 +496,6 @@ class MyClass {
 
 ```
 
-## 환경 설정과 컴파일러 옵션
-* tsconfig.json: TypeScript 프로젝트의 설정 파일
-* 주요 컴파일러 옵션: 프로젝트의 컴파일 방식을 지정하는 옵션
-
-```javascript
-{
-    "compilerOptions": {
-        "target": "es5",
-        "module": "commonjs",
-        "strict": true,
-        "outDir": "./dist"
-    },
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules"]
-}
-```
-
 ## 템플릿 리터럴 타입
 * 문자열 리터럴 타입을 기반으로 새로운 문자열 타입을 생성
 * 타입 레벨에서 문자열 조작이 가능
