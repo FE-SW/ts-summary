@@ -496,48 +496,6 @@ class MyClass {
 
 ```
 
-## 유틸리티 타입
-* Partial, Readonly 등: 기존 타입을 기반으로 변형된 타입을 만듬
-
-```javascript
-type Todo = {
-    id: number;
-    title: string;
-    description: string;
-    completed: boolean;
-}
-
-// Partial: 모든 속성을 선택적으로 만들기
-type PartialTodo = Partial<Todo>;
-  
-// Readonly: 모든 속성을 readonly로 만들기
-type ReadonlyTodo = Readonly<Todo>;
-
-// Pick: 특정 속성만 선택하여 새로운 타입을 생성
-type TodoPreview = Pick<Todo, "title" | "description">;
-
-// Omit: 특정 속성을 제외하고 새로운 타입을 생성
-type TodoWithoutDescription = Omit<Todo, "description">;
-
-// 사용 예제
-const updateTodo = (todo: Todo, fieldsToUpdate: PartialTodo): Todo => {
-    return { ...todo, ...fieldsToUpdate };
-}
-
-const todo: Todo = {
-    id: 1,
-    title: "Learn TypeScript",
-    description: "Study hard!",
-    completed: false
-};
-
-const updatedTodo = updateTodo(todo, {
-    description: "Study harder!"
-});
-
-console.log(updatedTodo); // 출력: { id: 1, title: 'Learn TypeScript', description: 'Study harder!', completed: false }
-```
-
 ## 환경 설정과 컴파일러 옵션
 * tsconfig.json: TypeScript 프로젝트의 설정 파일
 * 주요 컴파일러 옵션: 프로젝트의 컴파일 방식을 지정하는 옵션
@@ -586,6 +544,47 @@ const styles: CSSStyles = {
     "font-size": 16,
     "background-color": "#fff"
 };
+```
+## 유틸리티 타입
+* Partial, Readonly 등: 기존 타입을 기반으로 변형된 타입을 만듬
+
+```javascript
+type Todo = {
+    id: number;
+    title: string;
+    description: string;
+    completed: boolean;
+}
+
+// Partial: 모든 속성을 선택적으로 만들기
+type PartialTodo = Partial<Todo>;
+  
+// Readonly: 모든 속성을 readonly로 만들기
+type ReadonlyTodo = Readonly<Todo>;
+
+// Pick: 특정 속성만 선택하여 새로운 타입을 생성
+type TodoPreview = Pick<Todo, "title" | "description">;
+
+// Omit: 특정 속성을 제외하고 새로운 타입을 생성
+type TodoWithoutDescription = Omit<Todo, "description">;
+
+// 사용 예제
+const updateTodo = (todo: Todo, fieldsToUpdate: PartialTodo): Todo => {
+    return { ...todo, ...fieldsToUpdate };
+}
+
+const todo: Todo = {
+    id: 1,
+    title: "Learn TypeScript",
+    description: "Study hard!",
+    completed: false
+};
+
+const updatedTodo = updateTodo(todo, {
+    description: "Study harder!"
+});
+
+console.log(updatedTodo); // 출력: { id: 1, title: 'Learn TypeScript', description: 'Study harder!', completed: false }
 ```
 
 ## Partial<T>
