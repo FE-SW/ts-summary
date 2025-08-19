@@ -758,3 +758,95 @@ let value: NonNullableString = "Hello";
 // value = null; // 오류 발생
 // value = undefined; // 오류 발생
 ```
+
+## ReadonlyArray<T>
+- 배열을 읽기 전용으로 만들어 변경 메서드(push/pop 등)를 금지
+- 불변 데이터 패턴에 유용
+
+```javascript
+const nums: ReadonlyArray<number> = [1, 2, 3];
+// nums.push(4); // 오류
+function sum(xs: ReadonlyArray<number>) {
+  return xs.reduce((a, b) => a + b, 0);
+}
+```
+
+### Parameters<T>
+- 함수 타입의 매개변수 타입들을 튜플로 추출
+```ts
+type T0 = Parameters<(a: string, b: number) => void>; // [string, number]
+type T1 = Parameters<(...args: [id: number, name: string]) => any>; // [number, string]
+```
+
+### ConstructorParameters<T>
+- 생성자 타입의 매개변수 타입들을 튜플로 추출
+```ts
+type T0 = ConstructorParameters<new (name: string, age: number) => {}>; // [string, number]
+type T1 = ConstructorParameters<abstract new (...args: [url: string]) => any>; // [string]
+```
+
+### ReturnType<T>
+- 함수 타입의 반환 타입을 추출
+```ts
+type T0 = ReturnType<() => string>;                          // string
+type T1 = ReturnType<(id: number) => Promise<{ id: number }>>; // Promise<{ id: number }>
+```
+
+### InstanceType<T>
+- 생성자 타입으로부터 인스턴스 타입을 추출
+```ts
+type T0 = InstanceType<new () => { x: number }>; // { x: number }
+type T1 = InstanceType<abstract new (...args: any[]) => Date>; // Date
+```
+
+### ThisParameterType<T>
+- this 매개변수를 선언한 함수 타입에서 this의 타입을 추출
+```ts
+type T0 = ThisParameterType<(this: HTMLDivElement, e: MouseEvent) => void>; // HTMLDivElement
+type T1 = ThisParameterType<(e: Event) => void>; // unknown (this 매개변수 없음)
+```
+
+### OmitThisParameter<T>
+- 함수 타입에서 this 매개변수를 제거한 새 함수 타입 생성
+```ts
+type T0 = OmitThisParameter<(this: HTMLElement, e: Event) => boolean>; // (e: Event) => boolean
+type T1 = OmitThisParameter<(e: MouseEvent) => void>; // (e: MouseEvent) => void (변화 없음)
+```
+
+### ThisType<T>
+- 객체 리터럴 컨텍스트에서 this의 타입을 지정(런타임 영향 없음). 단독 사용으론 효과가 없고, “객체 리터럴을 기대하는 제네릭 컨텍스트”에서 의미가 생김.
+- 
+```ts
+// ThisType 자체 예시(형태만)
+// 객체 리터럴 컨텍스트에서 this를 { x: number }로 간주
+type Ctx = ThisType<{ x: number }>;
+
+// 실전 패턴: 헬퍼와 함께 사용
+function defineMethods<T, M>(obj: T, methods: M & ThisType<T & M>): T & M {
+  return Object.assign(obj, methods);
+}
+const o = defineMethods({ x: 1 }, {
+  inc() { this.x += 1; } // 여기서 this는 { x: number; inc: () => void }
+});
+```
+
+## Awaited<T>
+- Promise(중첩 포함)의 내부 값을 추출
+
+```javascript
+type T1 = Awaited<Promise<string>>;        // string
+type T2 = Awaited<Promise<Promise<number>>>; // number
+```
+
+## 대소문자 변환 유틸
+- Uppercase<S>: 문자열 리터럴을 대문자로
+- Lowercase<S>: 소문자로
+- Capitalize<S>: 첫 글자만 대문자
+- Uncapitalize<S>: 첫 글자만 소문자
+
+```javascript
+type A = Uppercase<'ab-cd'>;     // 'AB-CD'
+type B = Lowercase<'AB-CD'>;     // 'ab-cd'
+type C = Capitalize<'hello'>;    // 'Hello'
+type D = Uncapitalize<'Hello'>;  // 'hello'
+```
