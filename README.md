@@ -7,18 +7,35 @@
 * never: 절대 발생하지 않는 값의 타입을 나타냄
 * object: 비 원시 타입을 나타내며 객체, 배열, 함수, 클래스의 인스턴스 등을 포함함
 * any: 모든 타입을 허용하는 타입
+* unknown: 모든 타입을 허용하지만, 사용하기 전에 타입 검사가 필요함. any보다 안전한 타입.
+
 
 ```javascript
+// string: 기본적인 문자열 타입
 let str: string = "Hello TypeScript";
-let num: number = 42;
-let bool: boolean = true;
-let arr: number[] = [1, 2, 3];
-let tuple: [string, number] = ["John", 25];
-enum Colors { Red, Green, Blue }
 
+// number: 기본적인 숫자 타입
+let num: number = 42;
+
+// boolean: 기본적인 불리언 타입
+let bool: boolean = true;
+
+// array: 동일한 타입의 원소를 여러 개 포함하는 배열
+let arr: number[] = [1, 2, 3];
+
+// tuple: 서로 다른 타입의 원소를 순서대로 포함하는 배열
+let tuple: [string, number] = ["John", 25];
+
+// enum: 명명된 상수의 집합
+enum Colors { Red, Green, Blue }
+let c: Colors = Colors.Red;
+
+// void: 아무 값도 반환하지 않는 함수의 반환 타입
 function logMessage(message: string): void {
   console.log(message);
 }
+
+// never: 절대 발생하지 않는 값의 타입
 function throwError(message: string): never {
   throw new Error(message);
 }
@@ -28,9 +45,24 @@ function infiniteLoop(): never {
   }
 }
 
-let c: Colors = Colors.Red;
+// null: 값이 없음을 나타냄
+let n: null = null;
+
+// undefined: 정의되지 않은 값을 나타냄
+let u: undefined = undefined;
+
+// object: 비 원시 타입을 나타냄
+let obj: object = { key: "value" };
+
+// any: 모든 타입을 허용하는 타입
 let notSure: any = 4;
 notSure = "maybe a string";
+
+// unknown: 모든 타입을 허용하지만, 사용 전에 타입 검사가 필요함
+let unknownValue: unknown = "unknown type";
+if (typeof unknownValue === "string") {
+  console.log(unknownValue.toUpperCase());
+}
 ```
 
 ## 타입 연산자 및 고급 타입
